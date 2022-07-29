@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -43,19 +44,21 @@ public class GuiServer extends Application{
 	
 	// HackNight application scene functionality members (non-communication)
 	Button teamButton;
+	
+	// for manager
 	Button managerButton, confirmSignin, confirmTeam, addToTeam;
 	TextField EnterTeamNumber = new TextField();
 	TextField EnterManagerID = new TextField();
-	TextField EnterManagerPass = new TextField();
+	PasswordField EnterManagerPass = new PasswordField();
 	TextField AddTeamMember = new TextField();
 	TextField CurNumber = new TextField(); // stores current team number for manager to access
 	TextField CurManagerID = new TextField();
-	
 	
 	public HashMap<Integer, ArrayList<String>> TeamsDict = new HashMap<Integer, ArrayList<String>>();
 	
 	ListView<String> listItems, listItems2;
 	
+	// ---------------------
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -76,7 +79,6 @@ public class GuiServer extends Application{
 		UserDB.put("U442299", "$0nGz");
 		
 		
-		
 		// for sync project
 		teamButton = new Button("Team Member");
 		
@@ -84,12 +86,12 @@ public class GuiServer extends Application{
 		
 		
 		
-		// Manager Functionality
+		// Manager Functionality, loads manager login page
 		managerButton = new Button("Manager");
 		managerButton.setOnAction(e-> primaryStage.setScene(sceneMap.get("manager")));
 		confirmSignin = new Button("Confirm Manager Sign in");
 		confirmSignin.setOnAction(e -> {
-			String tempID = EnterManagerID.getText();
+			String tempID = EnterManagerID.getText().toUpperCase();
 			String tempPass = EnterManagerPass.getText();
 			if (UserDB.containsKey(tempID)) {
 				String correctPass = UserDB.get(tempID);
@@ -106,7 +108,7 @@ public class GuiServer extends Application{
 			}
 		});
 		
-		
+		// creates this team (or adds manager to it if it exists)
 		confirmTeam = new Button("ConfirmTeamNumber");
 		confirmTeam.setOnAction(e -> {
 			String curTeam = EnterTeamNumber.getText();
@@ -117,13 +119,8 @@ public class GuiServer extends Application{
 				String mID = CurManagerID.getText();
 				if (TeamsDict.containsKey(current)) {
 					tempS = TeamsDict.get(current);
-					//mID = "U456";
-					// temporary user ID for now !!!!!!
 				}
-				else {
-					//mID = "U123";
-				}
-				tempS.add(mID);
+				tempS.add(mID.toUpperCase());
 				TeamsDict.put(current, tempS);
 				for (int a : TeamsDict.keySet()) {
 					System.out.println(TeamsDict.get(a));
@@ -133,13 +130,16 @@ public class GuiServer extends Application{
 			}
 		});
 		
+		// adds a new user id to that team's array list
 		addToTeam = new Button("Add to Team");
 		addToTeam.setOnAction( e -> {
 			String curID = CurNumber.getText();
 			System.out.println(curID);
 			ArrayList<String> tempS = new ArrayList<String>();
 			tempS = TeamsDict.get(Integer.parseInt(curID));
-			tempS.add(AddTeamMember.getText());
+			if (!tempS.contains(AddTeamMember.getText().toUpperCase())) {
+				tempS.add(AddTeamMember.getText().toUpperCase());
+			}
 			TeamsDict.put(Integer.parseInt(curID), tempS);
 			for (int a : TeamsDict.keySet()) {
 				System.out.println(TeamsDict.get(a));
