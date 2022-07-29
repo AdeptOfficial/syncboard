@@ -21,6 +21,11 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 public class GuiServer extends Application{
+	
+	
+	// Mock data for Users:
+	public HashMap<String, String> UserDB = new HashMap<String, String>();
+	
 
 	
 	TextField s1,s2,s3,s4, c1;
@@ -43,7 +48,8 @@ public class GuiServer extends Application{
 	TextField EnterManagerID = new TextField();
 	TextField EnterManagerPass = new TextField();
 	TextField AddTeamMember = new TextField();
-	TextField CurNumber = new TextField();
+	TextField CurNumber = new TextField(); // stores current team number for manager to access
+	TextField CurManagerID = new TextField();
 	
 	
 	public HashMap<Integer, ArrayList<String>> TeamsDict = new HashMap<Integer, ArrayList<String>>();
@@ -58,6 +64,19 @@ public class GuiServer extends Application{
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+		
+		// adds values to the mock user database
+		UserDB.put("U555555", "pa55word");
+		UserDB.put("U123456", "you");
+		UserDB.put("U100001", "taco1");
+		UserDB.put("U202020", "pizzas!");
+		UserDB.put("U334455", "h3r3@");
+		UserDB.put("U224488", "$ecur3");
+		UserDB.put("U111111", "m@ven");
+		UserDB.put("U442299", "$0nGz");
+		
+		
+		
 		// for sync project
 		teamButton = new Button("Team Member");
 		
@@ -70,7 +89,21 @@ public class GuiServer extends Application{
 		managerButton.setOnAction(e-> primaryStage.setScene(sceneMap.get("manager")));
 		confirmSignin = new Button("Confirm Manager Sign in");
 		confirmSignin.setOnAction(e -> {
-			
+			String tempID = EnterManagerID.getText();
+			String tempPass = EnterManagerPass.getText();
+			if (UserDB.containsKey(tempID)) {
+				String correctPass = UserDB.get(tempID);
+				// if correct, go to next page
+				if (correctPass.equals(tempPass)) {
+					primaryStage.setScene(createManagerScreen(tempID));
+				}
+				else {
+					System.out.println("Incorrect password");
+				}
+			}
+			else {
+				System.out.println("Incorrect User ID");
+			}
 		});
 		
 		
@@ -81,14 +114,14 @@ public class GuiServer extends Application{
 			if (curTeam != "") {
 				Integer current = Integer.parseInt(curTeam);
 				ArrayList<String> tempS = new ArrayList<String>();
-				String mID;
+				String mID = CurManagerID.getText();
 				if (TeamsDict.containsKey(current)) {
 					tempS = TeamsDict.get(current);
-					mID = "U456";
+					//mID = "U456";
 					// temporary user ID for now !!!!!!
 				}
 				else {
-					mID = "U123";
+					//mID = "U123";
 				}
 				tempS.add(mID);
 				TeamsDict.put(current, tempS);
@@ -170,8 +203,8 @@ public class GuiServer extends Application{
 		sceneMap.put("start", createStartScreen());
 		
 		// manager screens
-		sceneMap.put("managerLogin", createManagerLoginScreen());
-		sceneMap.put("manager", createManagerScreen());
+		sceneMap.put("manager", createManagerLoginScreen());
+		//sceneMap.put("manager", createManagerScreen());
 		//sceneMap.put("management", createManagmentScreen());
 		
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -227,8 +260,9 @@ public class GuiServer extends Application{
 	}
 	
 	// scene for manager to input their team number
-	public Scene createManagerScreen() {
-		
+	public Scene createManagerScreen(String ManagerID) {
+		CurManagerID.setText(ManagerID);
+		CurManagerID.setDisable(true);
 		BorderPane pane = new BorderPane();
 		pane.setPadding(new Insets(70));
 		pane.setStyle("-fx-background-color: green");
